@@ -8,14 +8,11 @@ from matplotlib.animation import FuncAnimation
 # this code is inspired by an excellent blog post. Please refer to
 # https://apmonitor.com/me575/index.php/Main/SimulatedAnnealing
 
-
 # define objective function
 # in the case of machine learning this would be a loss function
-def f1(x,y):
+def objective_function(x,y):
     res = 0.2 + x**2 + y**2 - 0.1*math.cos(6.0*3.1415*x) - 0.1*math.cos(6.0*3.1415*y)
     return(res)
-
-
 
 """
 simulated annealing: optimize a function through simulated annealing!
@@ -39,7 +36,6 @@ outputs:
 
     cycle_results: list of best tries per cycle
 """
-
 def simulated_annealing(objective, p_start, p_end, initial_try, n_cycles=50, n_rounds=50):
     # initial and final temperatures
     t_initial = -1.0/math.log(p_start)
@@ -110,7 +106,7 @@ def simulated_annealing(objective, p_start, p_end, initial_try, n_cycles=50, n_r
     cycle_results = [[t[0] for t in tries]] + [[t[1] for t in tries]] + [results]
     return(best_try, cycle_results)
 
-best, cyc = simulated_annealing(f1, 0.7, 0.001, [0.5, 0.5], 50, 50)
+best, cyc = simulated_annealing(objective_function, 0.7, 0.001, [0.5, 0.5], 50, 50)
 
 print(best)
 # make sure initial try is good
@@ -121,7 +117,7 @@ print([c[0] for c in cyc])
 # function to create a mesh. This is used not for the simulated annealing, but
 # for the visualization. Do not worry too much about it, I will point out the
 # code you actually need to do simulated annealing on your own
-def mesh(lower, upper, step, objective = f1):
+def mesh(lower, upper, step, objective = objective_function):
     xi = np.arange(lower, upper, step)
     yi = np.arange(lower, upper, step)
     # create mesh coords
@@ -134,7 +130,7 @@ def mesh(lower, upper, step, objective = f1):
         for j in range(0, mesh_x.shape[1]):
             mesh_objective[i,j] = objective(mesh_x[i,j], mesh_y[i,j])
     return(mesh_x, mesh_y, mesh_objective)
-xmesh, ymesh, fmesh = mesh(-1.0, 1.0, 0.01, f1)
+xmesh, ymesh, fmesh = mesh(-1.0, 1.0, 0.01, objective_function)
 
 # code for animation
 def animate(i):
