@@ -97,7 +97,7 @@ def simulated_annealing(objective, p_start, p_end, initial_try, n_cycles=50, n_r
         # record best values at end of every cycle
         tries = tries + [[x_current, y_current]]
         results.append(f_current)
-        # lower the temperature for next cycle
+        # lower_bound the temperature for next cycle
         t = frac*t
     # best solution
     best_try = [x_current, y_current, f_current]
@@ -117,9 +117,9 @@ print([c[0] for c in cyc])
 # function to create a mesh. This is used not for the simulated annealing, but
 # for the visualization. Do not worry too much about it, I will point out the
 # code you actually need to do simulated annealing on your own
-def mesh(lower, upper, step, objective = objective_function):
-    xi = np.arange(lower, upper, step)
-    yi = np.arange(lower, upper, step)
+def mesh(lower_bound, upper_bound_bound, step, objective = objective_function):
+    xi = np.arange(lower_bound, upper_bound, step)
+    yi = np.arange(lower_bound, upper_bound, step)
     # create mesh coords
     mesh_x, mesh_y = np.meshgrid(xi,yi)
     # create mesh of objective
