@@ -117,7 +117,7 @@ print([c[0] for c in cyc])
 # function to create a mesh. This is used not for the simulated annealing, but
 # for the visualization. Do not worry too much about it, I will point out the
 # code you actually need to do simulated annealing on your own
-def mesh(lower_bound, upper_bound_bound, step, objective = objective_function):
+def mesh(lower_bound, upper_bound, step, objective = objective_function):
     xi = np.arange(lower_bound, upper_bound, step)
     yi = np.arange(lower_bound, upper_bound, step)
     # create mesh coords
