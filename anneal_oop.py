@@ -48,6 +48,7 @@ class simulated_annealing(objective_fun):
         self.DeltaE_avg = 0.0
         self.DeltaE = None
         self.results = [self.best_objective]
+        self.history = [[*self.current_state, self.best_objective]]
         self.n_accepted = 1.0
         self.temperature = self.t_start
         self.accept = None
@@ -61,6 +62,7 @@ class simulated_annealing(objective_fun):
     def _check_objective(self):
         # calculate local change in energy
         temp_objective = self.fun(*self.current_state)
+        self.history.append([ *self.current_state , temp_objective])
         self.DeltaE = abs(temp_objective - self.best_objective)
         if (temp_objective > self.best_objective):
             if (self.cycle == 0 and self.round == 0):
@@ -103,6 +105,7 @@ class simulated_annealing(objective_fun):
 class animation_sa:
     def __init__(self, sa: simulated_annealing, lower: float, upper: float, step: float):
         self.xy = [[t[0] for t in sa.tries]] + [[t[1] for t in sa.tries]]
+        self.history = [[h[i] for h in sa.history] for i in range(3)]
         self.z = sa.results
         self.xyz = [*self.xy, self.z]
         if sa.n_args != 2:
@@ -149,9 +152,20 @@ class animation_sa:
         showlegend=False)
         fig.show()
 
-
-
-
+    def history_3D(self, title="Search History"):
+        surface = go.Surface(z=self.mesh_fn, x=self.mesh_x, y=self.mesh_y, opacity=0.5)
+        trace = go.Scatter3d(
+            x=self.history[0], y=self.history[1], z=self.history[2], mode='markers',marker = dict(
+                size = 1,
+                color = -np.arange(0, len(self.history[2])), # set color to an array/list of desired values
+                colorscale='Bluered')
+        )
+        fig = go.Figure(data = [ trace,surface ])
+        fig.update_layout(title=title, autosize=False,
+                          width=1000, height=1000,
+                          margin=dict(l=65, r=50, b=65, t=90),
+        showlegend=False)
+        fig.show()
 
 
 # viz = animation_sa(simanneal, -1.0, 1.0, 0.1)
