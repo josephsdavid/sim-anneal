@@ -36,6 +36,7 @@ outputs:
 
     cycle_results: list of best tries per cycle
 """
+# objective = thing to minimize
 def simulated_annealing(objective, p_start, p_end, initial_try, n_cycles=50, n_rounds=50):
     # initial and final temperatures
     t_initial = -1.0/math.log(p_start)
@@ -106,17 +107,19 @@ def simulated_annealing(objective, p_start, p_end, initial_try, n_cycles=50, n_r
     cycle_results = [[t[0] for t in tries]] + [[t[1] for t in tries]] + [results]
     return(best_try, cycle_results)
 
-best, cyc = simulated_annealing(objective_function, 0.7, 0.001, [0.5, 0.5], 50, 50)
+best, cyc_results = simulated_annealing(objective_function, 0.9, 0.0001, [0.5, 0.5], 50, 1000)
 
 print(best)
+
 # make sure initial try is good
-print([c[0] for c in cyc])
+print([c[0] for c in cyc_results])
 
 # visualization
 # create the meshes
 # function to create a mesh. This is used not for the simulated annealing, but
 # for the visualization. Do not worry too much about it, I will point out the
 # code you actually need to do simulated annealing on your own
+
 def mesh(lower_bound, upper_bound, step, objective = objective_function):
     xi = np.arange(lower_bound, upper_bound, step)
     yi = np.arange(lower_bound, upper_bound, step)
@@ -127,15 +130,16 @@ def mesh(lower_bound, upper_bound, step, objective = objective_function):
     mesh_objective = np.zeros(mesh_x.shape)
     # next we populate
     for i in range(0, mesh_x.shape[0]):
-        for j in range(0, mesh_x.shape[1]):
+        for j in range(0, mesh_y.shape[1]):
             mesh_objective[i,j] = objective(mesh_x[i,j], mesh_y[i,j])
     return(mesh_x, mesh_y, mesh_objective)
+
 xmesh, ymesh, fmesh = mesh(-1.0, 1.0, 0.01, objective_function)
 
 # code for animation
 def animate(i):
-    line.set_xdata(cyc[0][0:i])
-    line.set_ydata(cyc[1][0:i])
+    line.set_xdata(cyc_results[0][0:i])
+    line.set_ydata(cyc_results[1][0:i])
 
 fig, ax = plt.subplots()
 # Specify contour lines
@@ -149,7 +153,7 @@ plt.title('Non-Convex Function')
 plt.xlabel('x')
 plt.ylabel('y')
 
-line = ax.plot(cyc[0][0], cyc[1][0], 'r-o')[0]
+line = ax.plot(cyc_results[0][0], cyc_results[1][0], 'r-o')[0]
 anim = FuncAnimation(
     fig, animate, interval = 500, frames = 50
 )
@@ -158,14 +162,15 @@ anim.save('sa.mp4')
 
 plt.show()
 
+
 # show our progress
 fig = plt.figure()
 ax1 = fig.add_subplot(211)
-ax1.plot(cyc[2],'r.-')
+ax1.plot(cyc_results[2],'r.-')
 ax1.legend(['Objective'])
 ax2 = fig.add_subplot(212)
-ax2.plot(cyc[0],'b.-')
-ax2.plot(cyc[1],'g--')
+ax2.plot(cyc_results[0],'b.-')
+ax2.plot(cyc_results[1],'g--')
 ax2.legend(['x','y'])
 plt.savefig('iterations.png')
 plt.show()

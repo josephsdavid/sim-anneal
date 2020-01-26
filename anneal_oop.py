@@ -5,9 +5,9 @@ import random
 import math
 from matplotlib.animation import FuncAnimation
 from inspect import signature
-from typing import Callable
-from mpl_toolkits import mplot3d
 import plotly.graph_objects as go
+
+
 
 def example_2D(x,y):
     res = 0.2 + x**2 + y**2 - 0.1*math.cos(6.0*3.1415*x) - 0.1*math.cos(6.0*3.1415*y)
@@ -57,7 +57,7 @@ class simulated_annealing(objective_fun):
 
     def _generate_new_trial(self): # use _ for methods which wouldnt normally be accessed by user
         self.current_state = [x + random.random() - 0.5 for x in self.current_state]
-        self.current_state = [np.clip(x, float(self.lower_bound), float(self.upper_bound)) for x in self.current_state]
+        self.current_state = [max(min(x, self.upper_bound), self.lower_bound) for x in self.current_state]
 
     def _check_objective(self):
         # calculate local change in energy
@@ -105,9 +105,9 @@ class simulated_annealing(objective_fun):
 class animation_sa:
     def __init__(self, sa: simulated_annealing, lower: float, upper: float, step: float):
         self.xy = [[t[0] for t in sa.tries]] + [[t[1] for t in sa.tries]]
-        self.history = [[h[i] for h in sa.history] for i in range(3)]
         self.z = sa.results
         self.xyz = [*self.xy, self.z]
+        self.history = [[h[i] for h in sa.history] for i in range(3)]
         if sa.n_args != 2:
             print("we cannot animate in {} dimensions!".format(sa.n_args))
             return
